@@ -827,7 +827,7 @@ resultStatus_t Com_ParseValue (void* base, const char* token, valueTypes_t type,
 		break;
 
 	case V_LONGSTRING:
-		strcpy((char*) b, token);
+		Q_strncpyz((char*) b, token, MAX_VAR);
 		w = (int)strlen(token) + 1;
 		*writtenBytes = w;
 		break;
@@ -1138,7 +1138,7 @@ int Com_SetValue (void* base, const void* set, valueTypes_t type, int ofs, size_
 		return len;
 
 	case V_LONGSTRING:
-		strcpy((char*) b, (const char*) set);
+		Q_strncpyz((char*) b, (const char*) set, MAX_VAR);
 		len = (int)strlen((const char*) set) + 1;
 		return len;
 
@@ -3559,13 +3559,14 @@ static void Com_ParseTerrainDefinition (const char* name, const char** text)
 	const char* errhead = "Com_ParseTerrainDefinition: unexpected end of file (terraindef ";
 	TerrainDef* tDef = new TerrainDef;
 
-	strcpy(tDef->terrainName, name);
+	Q_strncpyz(tDef->terrainName, name, sizeof(tDef->terrainName));
 
 	/* get it's body */
 	const char* token = Com_Parse(text);
 
 	if (!*text || *token != '{') {
 		Com_Printf("Com_ParseTerrainDefinition: mapdef \"%s\" without body ignored\n", name);
+		delete tDef;
 		return;
 	}
 
